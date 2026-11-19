@@ -2,71 +2,162 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Verifikasi Konten</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      font-family: sans-serif;
-      background-color: var(--tg-theme-bg-color, #18181b);
-      color: var(--tg-theme-text-color, #ffffff);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      background-color: #0e1117;
+      color: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
       min-height: 100vh;
+      min-height: 100dvh;
       margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
+      padding: 24px 20px;
       text-align: center;
+      position: relative;
+      overflow-x: hidden;
     }
+
+    /* FULLSCREEN POSTER WALLPAPER (HALUS & TIDAK MENCOLOK) */
+    #bg-poster {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(5px) brightness(0.35) saturate(1.1);
+      transform: scale(1.08);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      pointer-events: none;
+    }
+
+    #bg-scrim {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(
+        180deg,
+        rgba(10, 12, 18, 0.65) 0%,
+        rgba(10, 12, 18, 0.45) 50%,
+        rgba(10, 12, 18, 0.85) 100%
+      );
+      pointer-events: none;
+    }
+
+    .content-layer {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      flex: 1;
+    }
+
+    .header-info {
+      margin-top: 6px;
+    }
+
+    .header-info h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .header-info p {
+      margin: 0;
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    /* KOTAK IKLAN ADSTERRA DI TENGAH */
     .ad-box {
       width: 100%;
       max-width: 320px;
       min-height: 250px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px dashed rgba(255, 255, 255, 0.25);
-      border-radius: 12px;
+      background: rgba(18, 22, 31, 0.68);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 16px 0;
+      margin: 18px 0;
       padding: 10px;
-      box-sizing: border-box;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
+
     .btn {
       width: 100%;
       max-width: 320px;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      background-color: var(--tg-theme-button-color, #2563eb);
-      color: var(--tg-theme-button-text-color, #ffffff);
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+      transition: transform 0.15s ease, opacity 0.2s ease;
     }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
     .btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+      box-shadow: none;
     }
   </style>
 </head>
 <body>
-  <div>
-    <h3>Menyiapkan Video...</h3>
-    <p id="status-text">Mohon tunggu <span id="timer">5</span> detik.</p>
+  <!-- BACKGROUND WALLPAPER POSTER -->
+  <div id="bg-poster"></div>
+  <div id="bg-scrim"></div>
+
+  <div class="content-layer">
+    <div class="header-info">
+      <h3 id="movie-title">Menyiapkan Video...</h3>
+      <p id="status-text">Mohon tunggu <span id="timer">5</span> detik.</p>
+    </div>
+
+    <!-- SLOT IKLAN ADSTERRA -->
+    <div class="ad-box">
+      <!-- PASTE SCRIPT BANNER / NATIVE BANNER ADSTERRA KAMU DI SINI -->
+      <small style="color: rgba(255,255,255,0.5);">Area Banner Iklan Adsterra (300x250)</small>
+    </div>
+
+    <button id="claim-btn" class="btn" disabled>Tunggu Sebentar...</button>
   </div>
 
-  <!-- SLOT IKLAN ADSTERRA -->
-  <div class="ad-box">
-    <!-- PASTE SCRIPT BANNER / NATIVE BANNER ADSTERRA KAMU DI SINI -->
-    <small>Area Banner Iklan Adsterra (300x250)</small>
-  </div>
-
-  <button id="claim-btn" class="btn" disabled>Tunggu Sebentar...</button>
+  <!-- Kalau pakai Social Bar Adsterra, taruh script-nya sebelum </body> -->
 
   <script>
+    // Opsional: isi Direct Link Adsterra (CPC) kalau mau 2x klik, atau biarkan kosong ''
+    const ADSTERRA_DIRECT_LINK = '';
+
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
@@ -74,7 +165,42 @@
     const params = new URLSearchParams(window.location.search);
     const itemId = params.get('id') || '';
 
+    function decodeBase64Url(str) {
+      const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      const binStr = atob(base64);
+      const bytes = Uint8Array.from(binStr, (m) => m.codePointAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function applyMovieBackground() {
+      try {
+        const hash = window.location.hash;
+        if (!hash || !hash.includes('info=')) return;
+        const raw = hash.split('info=')[1].split('&')[0];
+        const info = decodeBase64Url(raw);
+
+        if (info.t) {
+          document.getElementById('movie-title').textContent = info.t;
+        }
+
+        if (info.p) {
+          const preload = new Image();
+          preload.onload = () => {
+            const bgEl = document.getElementById('bg-poster');
+            bgEl.style.backgroundImage = `url("${info.p}")`;
+            bgEl.style.opacity = '1';
+          };
+          preload.src = info.p;
+        }
+      } catch (e) {
+        console.error('Gagal membaca info film:', e);
+      }
+    }
+
+    applyMovieBackground();
+
     let seconds = 5;
+    let directOpened = !ADSTERRA_DIRECT_LINK;
     const timerEl = document.getElementById('timer');
     const statusEl = document.getElementById('status-text');
     const claimBtn = document.getElementById('claim-btn');
@@ -85,9 +211,14 @@
         timerEl.textContent = seconds;
       } else {
         clearInterval(countdown);
-        statusEl.textContent = 'Video siap dikirim ke chat!';
         claimBtn.disabled = false;
-        claimBtn.textContent = '📥 Kirim Video ke Chat';
+        if (!directOpened) {
+          statusEl.textContent = 'Klik tombol di bawah untuk verifikasi.';
+          claimBtn.textContent = '🔓 Buka Video';
+        } else {
+          statusEl.textContent = 'Video siap dikirim ke chat!';
+          claimBtn.textContent = '📥 Kirim Video ke Chat';
+        }
       }
     }, 1000);
 
@@ -102,10 +233,21 @@
         return;
       }
 
+      if (!directOpened && ADSTERRA_DIRECT_LINK) {
+        directOpened = true;
+        try {
+          tg.openLink(ADSTERRA_DIRECT_LINK);
+        } catch {
+          window.open(ADSTERRA_DIRECT_LINK, '_blank');
+        }
+        statusEl.textContent = 'Terverifikasi! Klik lagi untuk kirim video.';
+        claimBtn.textContent = '📥 Kirim Video ke Chat';
+        return;
+      }
+
       claimBtn.disabled = true;
       claimBtn.textContent = 'Mengirim...';
 
-      // Mode Inline (jika ada initData dari Inline Button & backend aktif)
       if (tg.initData && tg.initData.length > 0) {
         try {
           const res = await fetch('/api/claim', {
@@ -120,13 +262,13 @@
 
           if (data.ok) {
             claimBtn.textContent = '✅ Terkirim!';
-            setTimeout(() => tg.close(), 800);
+            setTimeout(() => tg.close(), 700);
           } else {
             alert(data.error || 'Terjadi kesalahan.');
             claimBtn.disabled = false;
             claimBtn.textContent = 'Coba Lagi';
           }
-        } catch (err) {
+        } catch {
           alert('Koneksi gagal.');
           claimBtn.disabled = false;
           claimBtn.textContent = 'Coba Lagi';
@@ -134,7 +276,6 @@
         return;
       }
 
-      // Mode Keyboard (100% Tanpa Tunnel / GitHub Pages / Cloudflare Pages)
       tg.sendData(JSON.stringify({ itemId: itemId }));
     });
   </script>
