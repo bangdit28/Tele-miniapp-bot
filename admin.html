@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel Bot</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--tg-theme-bg-color, #121216);
+      color: var(--tg-theme-text-color, #f4f4f5);
+      margin: 0;
+      padding: 16px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .header h2 { margin: 0; font-size: 18px; }
+    .badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      font-weight: 600;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 6px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: inherit;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--tg-theme-button-color, #2563eb);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border-color: transparent;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      opacity: 0.85;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.25);
+      color: inherit;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    textarea { min-height: 75px; resize: vertical; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .chip.selected {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--tg-theme-button-color, #2563eb);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .cat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .cat-row:last-child { border-bottom: none; }
+    .muted { font-size: 12px; opacity: 0.7; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>🛠️ Admin Panel</h2>
+    <span class="badge" id="stats-badge">0 Konten</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('upload')">🎬 Tambah Konten</button>
+    <button class="tab-btn" onclick="switchTab('cats')">🏷️ Kategori</button>
+    <button class="tab-btn" onclick="switchTab('tools')">⚙️ Tools</button>
+  </div>
+
+  <!-- TAB 1: TAMBAH FILM / SERIAL -->
+  <div id="tab-upload" class="panel active">
+    <div class="card">
+      <label>Jenis Konten</label>
+      <select id="upload-mode" onchange="toggleUploadMode()">
+        <option value="film">🎬 Film Baru (Single Video)</option>
+        <option value="serial">📺 Serial Baru (Multi Episode)</option>
+        <option value="add_episode">➕ Tambah Episode ke Serial yang Ada</option>
+      </select>
+
+      <div id="existing-series-box" class="hidden">
+        <label>Pilih Serial</label>
+        <select id="existing-series"></select>
+      </div>
+
+      <div id="title-box">
+        <label>Judul Film / Serial</label>
+        <input type="text" id="content-title" placeholder="Contoh: MobLand Season 1" />
+      </div>
+
+      <div id="ep-title-box" class="hidden">
+        <label>Nama / Nomor Episode</label>
+        <input type="text" id="ep-title" placeholder="Contoh: Episode 1 (atau kosongkan auto)" />
+      </div>
+
+      <div id="desc-box">
+        <label>Tahun / Sinopsis (Opsional)</label>
+        <textarea id="content-desc" placeholder="Tahun: 2025&#10;Sinopsis singkat..."></textarea>
+
+        <label>Pilih Kategori (Klik untuk memilih)</label>
+        <div class="chips" id="cat-chips"></div>
+      </div>
+
+      <label>Sumber Video</label>
+      <select id="video-source">
+        <option value="">📤 Upload / Forward Video Setelah Ini</option>
+      </select>
+
+      <button class="btn" onclick="submitContent()">🚀 Simpan & Lanjutkan</button>
+    </div>
+  </div>
+
+  <!-- TAB 2: KELOLA KATEGORI GRUP -->
+  <div id="tab-cats" class="panel">
+    <div class="card">
+      <label>Tambah Kategori Baru ke Bot & Grup</label>
+      <input type="text" id="new-cat-label" placeholder="Nama Tombol (misal: 💥 Action)" />
+      <input type="text" id="new-cat-slug" placeholder="Hashtag tanpa # (misal: action)" />
+      <button class="btn" onclick="addCategory()">➕ Tambah Kategori</button>
+    </div>
+
+    <div class="card">
+      <label>Kategori Aktif di Grup</label>
+      <div id="cat-list"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: TOOLS -->
+  <div id="tab-tools" class="panel">
+    <div class="card">
+      <label>Sinkronisasi Channel Katalog</label>
+      <p class="muted">Posting otomatis konten lama yang belum masuk Channel Katalog agar semua link di Grup loncat ke Channel.</p>
+      <button class="btn" onclick="sendAdmin({ adminAction: 'sync_katalog' })">🔄 Sync Semua ke Katalog</button>
+    </div>
+
+    <div class="card">
+      <label>Hapus Konten</label>
+      <input type="text" id="del-item-id" placeholder="Masukkan kode (misal: vid_xxx atau ser_xxx)" />
+      <button class="btn" style="background:#dc2626" onclick="deleteItem()">🗑️ Hapus Konten</button>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let state = { c: [], s: [], d: [], stats: { total: 0 } };
+    let selectedCats = new Set();
+
+    function decodeBase64Url(str) {
+      const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+      const binStr = atob(base64);
+      const bytes = Uint8Array.from(binStr, (m) => m.codePointAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function initFromHash() {
+      try {
+        const hash = window.location.hash;
+        if (hash && hash.includes('data=')) {
+          const raw = hash.split('data=')[1].split('&')[0];
+          state = decodeBase64Url(raw);
+        }
+      } catch (e) {
+        console.error('Gagal decode state:', e);
+      }
+
+      document.getElementById('stats-badge').textContent = `${state.stats?.total || 0} Konten`;
+
+      // Render kategori chips & list
+      const chipsEl = document.getElementById('cat-chips');
+      const listEl = document.getElementById('cat-list');
+      chipsEl.innerHTML = '';
+      listEl.innerHTML = '';
+
+      (state.c || []).forEach((cat, idx) => {
+        if (idx === 0) selectedCats.add(cat.slug);
+
+        const chip = document.createElement('div');
+        chip.className = 'chip' + (selectedCats.has(cat.slug) ? ' selected' : '');
+        chip.textContent = cat.label;
+        chip.onclick = () => {
+          if (selectedCats.has(cat.slug)) {
+            selectedCats.delete(cat.slug);
+            chip.classList.remove('selected');
+          } else {
+            selectedCats.add(cat.slug);
+            chip.classList.add('selected');
+          }
+        };
+        chipsEl.appendChild(chip);
+
+        const row = document.createElement('div');
+        row.className = 'cat-row';
+        row.innerHTML = `
+          <div>
+            <strong>${cat.label}</strong>
+            <div class="muted">#${cat.slug}</div>
+          </div>
+          <button class="btn-danger" onclick="delCategory('${cat.slug}')">Hapus</button>
+        `;
+        listEl.appendChild(row);
+      });
+
+      // Render daftar serial
+      const seriesSel = document.getElementById('existing-series');
+      seriesSel.innerHTML = '';
+      if ((state.s || []).length === 0) {
+        seriesSel.innerHTML = '<option value="">Belum ada serial</option>';
+      } else {
+        state.s.forEach((ser) => {
+          const opt = document.createElement('option');
+          opt.value = ser.id;
+          opt.textContent = `${ser.t} (${ser.e} Eps)`;
+          seriesSel.appendChild(opt);
+        });
+      }
+
+      // Render draft gudang
+      const sourceSel = document.getElementById('video-source');
+      (state.d || []).forEach((drf) => {
+        const opt = document.createElement('option');
+        opt.value = drf.id;
+        opt.textContent = `📦 Draft: ${drf.n}`;
+        sourceSel.appendChild(opt);
+      });
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', ['upload', 'cats', 'tools'][i] === name);
+      });
+      document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    function toggleUploadMode() {
+      const mode = document.getElementById('upload-mode').value;
+      document.getElementById('existing-series-box').classList.toggle('hidden', mode !== 'add_episode');
+      document.getElementById('title-box').classList.toggle('hidden', mode === 'add_episode');
+      document.getElementById('desc-box').classList.toggle('hidden', mode === 'add_episode');
+      document.getElementById('ep-title-box').classList.toggle('hidden', mode === 'film');
+    }
+
+    async function sendAdmin(payload) {
+      if (tg.platform === 'unknown') {
+        alert('Harus dibuka dari tombol /admin di Bot Telegram!');
+        return;
+      }
+
+      if (tg.initData && tg.initData.length > 0) {
+        try {
+          const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ initData: tg.initData, payload })
+          });
+          const data = await res.json();
+          if (data.ok) tg.close();
+          else alert(data.error || 'Gagal.');
+        } catch {
+          alert('Koneksi gagal.');
+        }
+        return;
+      }
+
+      tg.sendData(JSON.stringify(payload));
+    }
+
+    function submitContent() {
+      const mode = document.getElementById('upload-mode').value;
+      const title = document.getElementById('content-title').value.trim();
+      const description = document.getElementById('content-desc').value.trim();
+      const epTitle = document.getElementById('ep-title').value.trim();
+      const seriesId = document.getElementById('existing-series').value;
+      const draftId = document.getElementById('video-source').value;
+
+      if (mode !== 'add_episode' && !title) {
+        alert('Judul wajib diisi!');
+        return;
+      }
+      if (mode === 'add_episode' && !seriesId) {
+        alert('Pilih serial terlebih dahulu!');
+        return;
+      }
+
+      sendAdmin({
+        adminAction: 'prepare_upload',
+        mode,
+        title,
+        description,
+        epTitle,
+        seriesId,
+        draftId,
+        categories: Array.from(selectedCats)
+      });
+    }
+
+    function addCategory() {
+      const label = document.getElementById('new-cat-label').value.trim();
+      const slug = document.getElementById('new-cat-slug').value.trim();
+      if (!label) {
+        alert('Nama tombol kategori wajib diisi!');
+        return;
+      }
+      sendAdmin({ adminAction: 'add_category', label, slug });
+    }
+
+    function delCategory(slug) {
+      if (!confirm(`Hapus kategori #${slug}?`)) return;
+      sendAdmin({ adminAction: 'del_category', slug });
+    }
+
+    function deleteItem() {
+      const itemId = document.getElementById('del-item-id').value.trim();
+      if (!itemId) return alert('Isi kode item!');
+      sendAdmin({ adminAction: 'delete_item', itemId });
+    }
+
+    initFromHash();
+  </script>
+</body>
+</html>
