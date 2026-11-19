@@ -164,6 +164,106 @@
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
     textarea { min-height: 74px; resize: vertical; }
 
+    /* TMDB AUTOCOMPLETE */
+    .tmdb-box {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.28);
+      border-radius: 12px;
+      padding: 11px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .tmdb-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+    .tmdb-head span {
+      font-size: 12px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+    .tmdb-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      font-weight: 600;
+    }
+    .tmdb-badge.off {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fcd34d;
+    }
+    .tmdb-box input {
+      margin-bottom: 0;
+      background: rgba(11, 14, 20, 0.75);
+    }
+    .tmdb-results {
+      margin-top: 8px;
+      background: #0f141e;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+    .tmdb-results.open { display: block; }
+    .tmdb-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .tmdb-item:last-child { border-bottom: none; }
+    .tmdb-item:active { background: rgba(59, 130, 246, 0.16); }
+    .tmdb-thumb {
+      width: 36px;
+      height: 52px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: var(--card-2);
+      flex-shrink: 0;
+    }
+    .tmdb-meta { min-width: 0; flex: 1; }
+    .tmdb-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tmdb-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .tmdb-picked {
+      display: none;
+      margin-top: 8px;
+      align-items: center;
+      gap: 10px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 9px;
+      padding: 8px;
+      font-size: 12px;
+      color: #a7f3d0;
+    }
+    .tmdb-picked.show { display: flex; }
+    .tmdb-picked img {
+      width: 32px;
+      height: 46px;
+      border-radius: 5px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
     .file-drop {
       border: 1.5px dashed rgba(255, 255, 255, 0.16);
       background: var(--card-2);
@@ -200,21 +300,13 @@
       line-height: 1.45;
     }
 
-    .progress-wrap {
-      display: none;
-      margin-bottom: 12px;
-    }
+    .progress-wrap { display: none; margin-bottom: 12px; }
     .progress-bar-bg {
-      width: 100%;
-      height: 8px;
-      background: var(--card-2);
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 6px;
+      width: 100%; height: 8px; background: var(--card-2); border-radius: 999px;
+      overflow: hidden; margin-bottom: 6px;
     }
     .progress-bar-fill {
-      width: 0%;
-      height: 100%;
+      width: 0%; height: 100%;
       background: linear-gradient(90deg, var(--primary), var(--emerald));
       transition: width 0.15s ease;
     }
@@ -366,7 +458,7 @@
       </div>
       <div>
         <h1>Studio Bot Panel</h1>
-        <span>Kelola Konten & Kategori</span>
+        <span>Kelola Konten & TMDB Sync</span>
       </div>
     </div>
     <div class="owner-pill"><span class="dot-live"></span> Owner</div>
@@ -425,7 +517,7 @@
     <p class="hint" style="text-align:center;margin-top:10px;">Menampilkan maks. 25 konten terbaru. Untuk mencari konten lama, ketik <code>/admin judul</code> di chat bot.</p>
   </div>
 
-  <!-- TAB 2: TAMBAH FILM / SERIAL + POSTER & VIDEO -->
+  <!-- TAB 2: TAMBAH FILM / SERIAL + TMDB -->
   <div id="tab-upload" class="panel">
     <div class="card">
       <div class="card-title">🎬 Tambah Konten Baru</div>
@@ -437,6 +529,25 @@
         <option value="add_episode">➕ Tambah Episode ke Serial yang Ada</option>
       </select>
 
+      <!-- TMDB LIVE AUTOCOMPLETE (UPLOAD) -->
+      <div class="tmdb-box" id="tmdb-upload-box">
+        <div class="tmdb-head">
+          <span>🔍 Auto-Isi dari TMDB</span>
+          <span class="tmdb-badge off" id="tmdb-status-upload">Belum Diset</span>
+        </div>
+        <input
+          type="text"
+          id="tmdb-search-upload"
+          placeholder="Ketik judul (misal: alas rob)..."
+          oninput="onTmdbInput(this.value, 'upload')"
+        />
+        <div class="tmdb-results" id="tmdb-results-upload"></div>
+        <div class="tmdb-picked" id="tmdb-picked-upload">
+          <img id="tmdb-picked-img" alt="" />
+          <div id="tmdb-picked-txt"></div>
+        </div>
+      </div>
+
       <div id="existing-series-box" class="hidden">
         <label class="field-label">Pilih Serial</label>
         <select id="existing-series"></select>
@@ -444,7 +555,7 @@
 
       <div id="title-box">
         <label class="field-label">Judul Film / Serial</label>
-        <input type="text" id="content-title" placeholder="Contoh: MobLand Season 1" />
+        <input type="text" id="content-title" placeholder="Otomatis terisi dari TMDB atau ketik manual" />
       </div>
 
       <div id="ep-title-box" class="hidden">
@@ -459,8 +570,8 @@
         <label class="field-label">Pilih Kategori</label>
         <div class="chips" id="upload-cat-chips"></div>
 
-        <label class="field-label">URL Poster Gambar (Opsional)</label>
-        <input type="url" id="poster-url" placeholder="https://... (bisa dipakai di semua mode)" />
+        <label class="field-label">URL Poster Gambar (Otomatis dari TMDB / Manual)</label>
+        <input type="url" id="poster-url" placeholder="https://image.tmdb.org/..." />
       </div>
 
       <label class="field-label">Metode Upload Video</label>
@@ -471,7 +582,7 @@
 
       <div id="direct-upload-box" class="hidden">
         <div id="direct-mode-warn" class="warn-box hidden">
-          ⚠️ Kamu sedang di mode <b>Keyboard (Tanpa Tunnel)</b>. Upload file dari galeri di halaman ini butuh backend HTTPS (mode <b>inline</b>). Untuk sekarang pakai pilihan <b>Kirim via Chat Bot / Gudang</b> (bisa kirim Album Foto Poster + Video sekaligus dalam 1x kirim!).
+          ⚠️ Kamu sedang di mode <b>Keyboard (Tanpa Tunnel)</b>. Upload file dari galeri di halaman ini butuh backend HTTPS (mode <b>inline</b>). Untuk sekarang pakai pilihan <b>Kirim via Chat Bot / Gudang</b> (bisa kirim Album Foto Poster + Video sekaligus!).
         </div>
 
         <label class="field-label" id="poster-file-label">File Poster (Opsional)</label>
@@ -529,6 +640,7 @@
     <div class="card">
       <div class="card-title">ℹ️ Informasi Server</div>
       <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+        • TMDB API: <strong style="color:#fff" id="info-tmdb">-</strong><br/>
         • Mode WebApp: <strong style="color:#fff" id="info-mode">-</strong><br/>
         • URL Mini App: <strong style="color:#fff;word-break:break-all" id="info-url">-</strong>
       </div>
@@ -545,11 +657,29 @@
 
       <input type="hidden" id="edit-item-id" />
 
+      <!-- TMDB LIVE AUTOCOMPLETE (EDIT MODAL) -->
+      <div class="tmdb-box">
+        <div class="tmdb-head">
+          <span>🔍 Sinkronkan Info & Poster TMDB</span>
+          <span class="tmdb-badge off" id="tmdb-status-edit">Belum Diset</span>
+        </div>
+        <input
+          type="text"
+          id="tmdb-search-edit"
+          placeholder="Cari judul resmi di TMDB..."
+          oninput="onTmdbInput(this.value, 'edit')"
+        />
+        <div class="tmdb-results" id="tmdb-results-edit"></div>
+      </div>
+
       <label class="field-label">Judul</label>
       <input type="text" id="edit-item-title" />
 
       <label class="field-label">Tahun / Sinopsis</label>
       <textarea id="edit-item-desc"></textarea>
+
+      <label class="field-label">URL Poster (untuk Wallpaper Mini App)</label>
+      <input type="url" id="edit-item-poster" placeholder="https://image.tmdb.org/..." />
 
       <label class="field-label">Kategori</label>
       <div class="chips" id="edit-cat-chips"></div>
@@ -593,12 +723,15 @@
     tg.ready();
     tg.expand();
 
-    let state = { c: [], d: [], items: [], stats: { total: 0, cats: 0, drafts: 0, mode: '-', url: '-' } };
+    let state = { c: [], d: [], items: [], tmdb: '', stats: { total: 0, cats: 0, drafts: 0, mode: '-', url: '-' } };
     let uploadCats = new Set();
     let editItemCats = new Set();
     let editEpisodesState = [];
     let typeFilter = 'all';
     let slugEditedManually = false;
+
+    const tmdbTimers = { upload: null, edit: null };
+    const tmdbCache = { upload: [], edit: [] };
 
     const hasBackendApi = Boolean(tg.initData && tg.initData.length > 0);
 
@@ -634,11 +767,175 @@
       document.getElementById('info-mode').textContent = state.stats?.mode || 'keyboard';
       document.getElementById('info-url').textContent = state.stats?.url || '-';
 
+      const hasTmdb = Boolean(state.tmdb && state.tmdb.trim());
+      document.getElementById('info-tmdb').textContent = hasTmdb ? 'Aktif ✅' : 'Belum Diset (/settmdb)';
+      ['tmdb-status-upload', 'tmdb-status-edit'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (hasTmdb) {
+          el.textContent = 'TMDB Aktif';
+          el.classList.remove('off');
+        } else {
+          el.textContent = 'Ketik /settmdb di bot';
+          el.classList.add('off');
+        }
+      });
+
       if (state.c?.length) uploadCats.add(state.c[0].slug);
 
       renderUploadForm();
       renderCategories();
       renderItems();
+    }
+
+    // === TMDB API HELPER ===
+    async function fetchTmdb(apiPath) {
+      const key = (state.tmdb || '').trim();
+      if (!key) throw new Error('TMDB API Key belum diset.');
+
+      const isBearer = key.startsWith('eyJ') || key.length > 45;
+      const sep = apiPath.includes('?') ? '&' : '?';
+      const url = isBearer
+        ? `https://api.themoviedb.org/3${apiPath}`
+        : `https://api.themoviedb.org/3${apiPath}${sep}api_key=${encodeURIComponent(key)}`;
+
+      const headers = { Accept: 'application/json' };
+      if (isBearer) headers.Authorization = `Bearer ${key}`;
+
+      const res = await fetch(url, { headers });
+      if (!res.ok) throw new Error('Gagal akses TMDB');
+      return res.json();
+    }
+
+    function onTmdbInput(val, target) {
+      clearTimeout(tmdbTimers[target]);
+      const box = document.getElementById(`tmdb-results-${target}`);
+      const q = val.trim();
+
+      if (!state.tmdb) {
+        box.innerHTML = '<div style="padding:10px;font-size:12px;color:#fcd34d;">Set API Key TMDB dulu lewat chat bot: <code>/settmdb API_KEY</code></div>';
+        box.classList.add('open');
+        return;
+      }
+
+      if (q.length < 2) {
+        box.classList.remove('open');
+        box.innerHTML = '';
+        return;
+      }
+
+      tmdbTimers[target] = setTimeout(async () => {
+        box.innerHTML = '<div style="padding:10px;font-size:12px;color:#94a3b8;">Mencari di TMDB...</div>';
+        box.classList.add('open');
+        try {
+          const data = await fetchTmdb(`/search/multi?language=id-ID&include_adult=false&query=${encodeURIComponent(q)}`);
+          const list = (data.results || [])
+            .filter((r) => r.media_type === 'movie' || r.media_type === 'tv')
+            .slice(0, 6);
+
+          tmdbCache[target] = list;
+          if (list.length === 0) {
+            box.innerHTML = '<div style="padding:10px;font-size:12px;color:#94a3b8;">Tidak ditemukan di TMDB.</div>';
+            return;
+          }
+
+          box.innerHTML = list.map((r, idx) => {
+            const isTv = r.media_type === 'tv';
+            const title = isTv ? (r.name || r.original_name) : (r.title || r.original_title);
+            const dt = isTv ? r.first_air_date : r.release_date;
+            const year = dt ? dt.slice(0, 4) : '-';
+            const thumb = r.poster_path ? `https://image.tmdb.org/t/p/w92${r.poster_path}` : '';
+            const typeLbl = isTv ? '📺 Serial' : '🎬 Film';
+            const vote = r.vote_average ? ` • ⭐ ${r.vote_average.toFixed(1)}` : '';
+
+            return `
+              <div class="tmdb-item" onclick="pickTmdbItem('${target}', ${idx})">
+                ${thumb ? `<img class="tmdb-thumb" src="${thumb}" alt="" />` : '<div class="tmdb-thumb"></div>'}
+                <div class="tmdb-meta">
+                  <div class="tmdb-title">${esc(title)}</div>
+                  <div class="tmdb-sub">${typeLbl} • ${esc(year)}${vote}</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          box.innerHTML = `<div style="padding:10px;font-size:12px;color:#fca5a5;">${esc(err.message)}</div>`;
+        }
+      }, 380);
+    }
+
+    async function pickTmdbItem(target, idx) {
+      const r = tmdbCache[target][idx];
+      if (!r) return;
+
+      const box = document.getElementById(`tmdb-results-${target}`);
+      box.classList.remove('open');
+
+      const isTv = r.media_type === 'tv';
+      const title = isTv ? (r.name || r.original_name) : (r.title || r.original_title);
+      const dt = isTv ? r.first_air_date : r.release_date;
+      const year = dt ? dt.slice(0, 4) : '';
+      const posterUrl = r.poster_path ? `https://image.tmdb.org/t/p/w780${r.poster_path}` : '';
+
+      let overview = (r.overview || '').trim();
+      if (!overview) {
+        try {
+          const en = await fetchTmdb(`/${r.media_type}/${r.id}?language=en-US`);
+          overview = (en.overview || '').trim();
+        } catch {}
+      }
+
+      const descLines = [];
+      if (year) descLines.push(`Tahun: ${year}`);
+      if (r.vote_average) descLines.push(`⭐ Rating: ${r.vote_average.toFixed(1)}/10`);
+      if (overview) descLines.push(`\n${overview}`);
+      const fullDesc = descLines.join('\n').slice(0, 600);
+
+      // Mapping genre TMDB ke kategori grup
+      const validSlugs = new Set((state.c || []).map((c) => c.slug));
+      const genreMap = { 27: 'horror', 35: 'comedy', 16: 'anime', 28: 'action', 18: 'drama', 878: 'scifi', 53: 'thriller', 10749: 'romance' };
+      const autoCats = new Set();
+      if (isTv && validSlugs.has('serial')) autoCats.add('serial');
+      else if (!isTv && validSlugs.has('film')) autoCats.add('film');
+      (r.genre_ids || []).forEach((gid) => {
+        const s = genreMap[gid];
+        if (s && validSlugs.has(s)) autoCats.add(s);
+      });
+
+      if (target === 'upload') {
+        document.getElementById('upload-mode').value = isTv ? 'serial' : 'film';
+        toggleUploadMode();
+        document.getElementById('content-title').value = title;
+        document.getElementById('content-desc').value = fullDesc;
+        document.getElementById('poster-url').value = posterUrl;
+        document.getElementById('tmdb-search-upload').value = title;
+
+        if (autoCats.size > 0) {
+          uploadCats = autoCats;
+          renderUploadFormChips();
+        }
+
+        const pickedEl = document.getElementById('tmdb-picked-upload');
+        const pickedImg = document.getElementById('tmdb-picked-img');
+        const pickedTxt = document.getElementById('tmdb-picked-txt');
+        if (posterUrl) {
+          pickedImg.src = `https://image.tmdb.org/t/p/w92${r.poster_path}`;
+          pickedImg.style.display = 'block';
+        } else {
+          pickedImg.style.display = 'none';
+        }
+        pickedTxt.innerHTML = `✅ Sinkron: <b>${esc(title)}</b> ${year ? `(${year})` : ''}`;
+        pickedEl.classList.add('show');
+      } else {
+        document.getElementById('edit-item-title').value = title;
+        document.getElementById('edit-item-desc').value = fullDesc;
+        document.getElementById('edit-item-poster').value = posterUrl;
+        document.getElementById('tmdb-search-edit').value = title;
+
+        if (autoCats.size > 0) {
+          editItemCats = autoCats;
+          renderEditCatChips();
+        }
+      }
     }
 
     function switchTab(name) {
@@ -678,6 +975,7 @@
         const syncHtml = it.k
           ? `<span class="sync-tag">● Katalog</span>`
           : `<span class="sync-tag nosync">○ Belum Sync</span>`;
+        const posterTag = it.p ? `<span class="mini-tag">🖼️ Poster</span>` : '';
 
         return `
           <div class="item-card">
@@ -686,7 +984,7 @@
               <div class="item-type ${it.sr ? '' : 'film'}">${badge}</div>
             </div>
             ${it.d ? `<div class="item-desc">${esc(it.d)}</div>` : ''}
-            <div class="item-meta">${syncHtml} ${tags} <span class="mini-tag">${esc(it.i)}</span></div>
+            <div class="item-meta">${syncHtml} ${posterTag} ${tags} <span class="mini-tag">${esc(it.i)}</span></div>
             <div class="item-actions">
               <button class="btn-sm primary" onclick="openEditItem('${esc(it.i)}')">✏️ Edit</button>
               ${it.sr ? `<button class="btn-sm" onclick="quickAddEpisode('${esc(it.i)}')">➕ Episode</button>` : ''}
@@ -697,13 +995,17 @@
       }).join('');
     }
 
-    function renderUploadForm() {
+    function renderUploadFormChips() {
       const chipsEl = document.getElementById('upload-cat-chips');
       chipsEl.innerHTML = (state.c || []).map((cat) => `
         <div class="chip ${uploadCats.has(cat.slug) ? 'selected' : ''}" onclick="toggleUploadCat('${esc(cat.slug)}', this)">
           ${esc(cat.label)}
         </div>
       `).join('');
+    }
+
+    function renderUploadForm() {
+      renderUploadFormChips();
 
       const seriesSel = document.getElementById('existing-series');
       const seriesList = (state.items || []).filter((it) => it.sr);
@@ -808,6 +1110,7 @@
     function toggleUploadMode() {
       const mode = document.getElementById('upload-mode').value;
       document.getElementById('existing-series-box').classList.toggle('hidden', mode !== 'add_episode');
+      document.getElementById('tmdb-upload-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('title-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('desc-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('ep-title-box').classList.toggle('hidden', mode === 'film');
@@ -822,6 +1125,15 @@
       document.getElementById('existing-series').value = seriesId;
     }
 
+    function renderEditCatChips() {
+      const chipsEl = document.getElementById('edit-cat-chips');
+      chipsEl.innerHTML = (state.c || []).map((cat) => `
+        <div class="chip ${editItemCats.has(cat.slug) ? 'selected' : ''}" onclick="toggleEditCat('${esc(cat.slug)}', this)">
+          ${esc(cat.label)}
+        </div>
+      `).join('');
+    }
+
     function openEditItem(itemId) {
       const item = (state.items || []).find((x) => x.i === itemId);
       if (!item) return;
@@ -829,14 +1141,12 @@
       document.getElementById('edit-item-id').value = item.i;
       document.getElementById('edit-item-title').value = item.t;
       document.getElementById('edit-item-desc').value = item.d || '';
+      document.getElementById('edit-item-poster').value = item.p || '';
+      document.getElementById('tmdb-search-edit').value = '';
+      document.getElementById('tmdb-results-edit').classList.remove('open');
 
       editItemCats = new Set(item.c || []);
-      const chipsEl = document.getElementById('edit-cat-chips');
-      chipsEl.innerHTML = (state.c || []).map((cat) => `
-        <div class="chip ${editItemCats.has(cat.slug) ? 'selected' : ''}" onclick="toggleEditCat('${esc(cat.slug)}', this)">
-          ${esc(cat.label)}
-        </div>
-      `).join('');
+      renderEditCatChips();
 
       const epBox = document.getElementById('edit-episodes-box');
       if (item.sr && Array.isArray(item.ep)) {
@@ -885,6 +1195,7 @@
       const itemId = document.getElementById('edit-item-id').value;
       const title = document.getElementById('edit-item-title').value.trim();
       const description = document.getElementById('edit-item-desc').value.trim();
+      const posterUrl = document.getElementById('edit-item-poster').value.trim();
       const updateKatalog = document.getElementById('edit-update-katalog').checked;
 
       if (!title) return alert('Judul tidak boleh kosong!');
@@ -894,6 +1205,7 @@
         itemId,
         title,
         description,
+        posterUrl,
         categories: Array.from(editItemCats),
         updateKatalog
       };
