@@ -21,14 +21,11 @@
       --rose: #ef4444;
     }
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
     body {
       margin: 0;
-      padding: 14px 14px 32px;
+      padding: 14px 14px 36px;
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -36,18 +33,13 @@
       line-height: 1.45;
     }
 
-    /* HEADER */
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 14px;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon {
       width: 38px;
       height: 38px;
@@ -58,17 +50,8 @@
       justify-content: center;
       box-shadow: 0 6px 18px var(--primary-glow);
     }
-    .brand h1 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-    .brand span {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-    }
+    .brand h1 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.2px; }
+    .brand span { display: block; font-size: 11px; color: var(--muted); }
     .owner-pill {
       display: inline-flex;
       align-items: center;
@@ -81,14 +64,8 @@
       font-size: 11px;
       font-weight: 600;
     }
-    .dot-live {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #34d399;
-    }
+    .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
 
-    /* STATS GRID */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -101,19 +78,9 @@
       border-radius: 12px;
       padding: 10px 12px;
     }
-    .stat-val {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.2;
-    }
-    .stat-lbl {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    .stat-val { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.2; }
+    .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-    /* SEGMENTED TABS */
     .nav-tabs {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -144,10 +111,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .nav-tab svg {
-      width: 17px;
-      height: 17px;
-    }
+    .nav-tab svg { width: 17px; height: 17px; }
     .nav-tab.active {
       background: linear-gradient(135deg, var(--primary), var(--indigo));
       color: #fff;
@@ -161,7 +125,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* CARDS & FORM */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -185,7 +148,7 @@
       color: var(--muted);
       margin-bottom: 6px;
     }
-    input[type="text"], select, textarea {
+    input[type="text"], input[type="url"], select, textarea {
       width: 100%;
       padding: 11px 12px;
       border-radius: 10px;
@@ -198,297 +161,194 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-    }
-    textarea { min-height: 78px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    textarea { min-height: 74px; resize: vertical; }
 
-    /* SEARCH & FILTERS */
-    .search-wrap {
-      position: relative;
-      margin-bottom: 10px;
-    }
-    .search-wrap svg {
-      position: absolute;
-      left: 12px;
-      top: 12px;
-      width: 16px;
-      height: 16px;
-      color: var(--muted);
-    }
-    .search-wrap input {
-      padding-left: 36px;
-      margin-bottom: 0;
-    }
-
-    .filter-pills {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
-    .pill-btn {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .pill-btn.active {
-      background: rgba(59, 130, 246, 0.16);
-      border-color: var(--primary);
-      color: #60a5fa;
-    }
-
-    /* CHIPS */
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-bottom: 14px;
-    }
-    .chip {
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
+    .file-drop {
+      border: 1.5px dashed rgba(255, 255, 255, 0.16);
       background: var(--card-2);
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 600;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      text-align: center;
       cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
+      transition: border-color 0.2s;
+      display: block;
     }
-    .chip.selected {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: var(--primary);
-      color: #93c5fd;
+    .file-drop:hover { border-color: var(--primary); }
+    .file-drop input[type="file"] { display: none; }
+    .file-drop-title { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+    .file-drop-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .poster-preview {
+      max-width: 110px;
+      max-height: 150px;
+      border-radius: 8px;
+      margin: 8px auto 0;
+      display: none;
+      object-fit: cover;
+      border: 1px solid var(--border);
     }
 
-    /* CONTENT ITEM LIST */
-    .item-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 13px;
-      margin-bottom: 10px;
+    .warn-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      line-height: 1.45;
     }
-    .item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
+
+    .progress-wrap {
+      display: none;
+      margin-bottom: 12px;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: var(--card-2);
+      border-radius: 999px;
+      overflow: hidden;
       margin-bottom: 6px;
     }
-    .item-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #fff;
-      word-break: break-word;
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--emerald));
+      transition: width 0.15s ease;
     }
+    .progress-text { font-size: 12px; color: var(--muted); text-align: center; }
+
+    .search-wrap { position: relative; margin-bottom: 10px; }
+    .search-wrap svg {
+      position: absolute; left: 12px; top: 12px; width: 16px; height: 16px; color: var(--muted);
+    }
+    .search-wrap input { padding-left: 36px; margin-bottom: 0; }
+
+    .filter-pills {
+      display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 2px;
+    }
+    .pill-btn {
+      padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+    }
+    .pill-btn.active {
+      background: rgba(59, 130, 246, 0.16); border-color: var(--primary); color: #60a5fa;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+    .chip {
+      padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--card-2); color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer; user-select: none; transition: all 0.15s ease;
+    }
+    .chip.selected {
+      background: rgba(59, 130, 246, 0.2); border-color: var(--primary); color: #93c5fd;
+    }
+
+    .item-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 13px; margin-bottom: 10px;
+    }
+    .item-top {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;
+    }
+    .item-title { font-size: 14px; font-weight: 700; color: #fff; word-break: break-word; }
     .item-type {
-      flex-shrink: 0;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(99, 102, 241, 0.16);
-      color: #a5b4fc;
+      flex-shrink: 0; font-size: 11px; font-weight: 600; padding: 3px 8px;
+      border-radius: 6px; background: rgba(99, 102, 241, 0.16); color: #a5b4fc;
     }
-    .item-type.film {
-      background: rgba(59, 130, 246, 0.16);
-      color: #93c5fd;
-    }
+    .item-type.film { background: rgba(59, 130, 246, 0.16); color: #93c5fd; }
     .item-desc {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 12px; color: var(--muted); margin-bottom: 8px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .item-meta {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
+    .item-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; }
     .mini-tag {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 6px;
-      background: var(--card-2);
-      color: var(--muted);
-      border: 1px solid var(--border);
+      font-size: 11px; padding: 2px 7px; border-radius: 6px;
+      background: var(--card-2); color: var(--muted); border: 1px solid var(--border);
     }
-    .sync-tag {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--emerald);
-    }
+    .sync-tag { font-size: 11px; font-weight: 600; color: var(--emerald); }
     .sync-tag.nosync { color: var(--amber); }
 
     .item-actions {
-      display: flex;
-      gap: 6px;
-      border-top: 1px solid var(--border);
-      padding-top: 10px;
+      display: flex; gap: 6px; border-top: 1px solid var(--border); padding-top: 10px;
     }
 
-    /* BUTTONS */
     .btn {
-      width: 100%;
-      padding: 12px 14px;
-      border: none;
-      border-radius: 11px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
+      width: 100%; padding: 12px 14px; border: none; border-radius: 11px;
+      font-size: 14px; font-weight: 700; cursor: pointer; color: #fff;
       background: linear-gradient(135deg, var(--primary), var(--indigo));
       box-shadow: 0 4px 14px var(--primary-glow);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn:active { transform: scale(0.98); }
     .btn-sm {
-      flex: 1;
-      padding: 7px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+      flex: 1; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card-2); color: var(--text); font-size: 12px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
     }
     .btn-sm.primary {
-      background: rgba(59, 130, 246, 0.16);
-      border-color: rgba(59, 130, 246, 0.35);
-      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.16); border-color: rgba(59, 130, 246, 0.35); color: #93c5fd;
     }
     .btn-sm.danger {
-      background: rgba(239, 68, 68, 0.12);
-      border-color: rgba(239, 68, 68, 0.28);
-      color: #fca5a5;
-      flex: 0 0 auto;
+      background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.28);
+      color: #fca5a5; flex: 0 0 auto;
     }
 
-    /* CATEGORY ROW */
     .cat-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
     }
     .cat-item:last-child { border-bottom: none; padding-bottom: 0; }
     .cat-info strong { display: block; font-size: 14px; }
     .cat-info span { font-size: 11px; color: var(--muted); }
     .cat-btns { display: flex; gap: 5px; }
     .icon-btn {
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      font-size: 12px;
-      cursor: pointer;
+      padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--card-2); color: var(--text); font-size: 12px; cursor: pointer;
     }
     .icon-btn.danger {
-      color: #fca5a5;
-      border-color: rgba(239, 68, 68, 0.25);
-      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5; border-color: rgba(239, 68, 68, 0.25); background: rgba(239, 68, 68, 0.1);
     }
 
-    /* BOTTOM-SHEET MODAL */
     .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      z-index: 50;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+      z-index: 50; display: none; align-items: flex-end; justify-content: center;
     }
     .modal-backdrop.open { display: flex; }
     .modal-sheet {
-      width: 100%;
-      max-width: 520px;
-      max-height: 88vh;
-      overflow-y: auto;
-      background: #141923;
-      border-top: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 20px 20px 0 0;
-      padding: 18px 16px 26px;
-      animation: slideUp 0.22s ease;
+      width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto;
+      background: #141923; border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px 20px 0 0; padding: 18px 16px 26px; animation: slideUp 0.22s ease;
     }
     @keyframes slideUp {
       from { transform: translateY(30px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    .modal-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .modal-head h3 { margin: 0; font-size: 16px; }
     .close-x {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--card-2);
-      color: var(--text);
-      font-size: 15px;
-      cursor: pointer;
+      width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card-2); color: var(--text); font-size: 15px; cursor: pointer;
     }
 
-    .ep-edit-row {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    .ep-edit-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
     .ep-edit-row input { margin-bottom: 0; padding: 8px 10px; font-size: 13px; }
-    .ep-edit-row.deleted input {
-      opacity: 0.35;
-      text-decoration: line-through;
-    }
+    .ep-edit-row.deleted input { opacity: 0.35; text-decoration: line-through; }
 
     .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-      font-size: 13px;
-      color: var(--muted);
+      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+      font-size: 13px; color: var(--muted);
     }
     .checkbox-row input { width: 16px; height: 16px; margin: 0; }
 
     .empty-box {
-      text-align: center;
-      padding: 28px 14px;
-      color: var(--muted);
-      background: var(--card);
-      border: 1px dashed var(--border);
-      border-radius: 14px;
+      text-align: center; padding: 28px 14px; color: var(--muted);
+      background: var(--card); border: 1px dashed var(--border); border-radius: 14px;
     }
     .hidden { display: none !important; }
     .hint { font-size: 11px; color: var(--muted); margin-top: -6px; margin-bottom: 12px; }
@@ -565,7 +425,7 @@
     <p class="hint" style="text-align:center;margin-top:10px;">Menampilkan maks. 25 konten terbaru. Untuk mencari konten lama, ketik <code>/admin judul</code> di chat bot.</p>
   </div>
 
-  <!-- TAB 2: TAMBAH FILM / SERIAL -->
+  <!-- TAB 2: TAMBAH FILM / SERIAL + POSTER & VIDEO -->
   <div id="tab-upload" class="panel">
     <div class="card">
       <div class="card-title">🎬 Tambah Konten Baru</div>
@@ -598,14 +458,44 @@
 
         <label class="field-label">Pilih Kategori</label>
         <div class="chips" id="upload-cat-chips"></div>
+
+        <label class="field-label">URL Poster Gambar (Opsional)</label>
+        <input type="url" id="poster-url" placeholder="https://... (bisa dipakai di semua mode)" />
       </div>
 
-      <label class="field-label">Sumber Video</label>
-      <select id="video-source">
-        <option value="">📤 Upload / Forward Video Setelah Ini</option>
+      <label class="field-label">Metode Upload Video</label>
+      <select id="video-source" onchange="toggleFileUploadUI()">
+        <option value="">💬 Kirim / Forward via Chat Bot / Gudang (Max 2 GB)</option>
+        <option value="__direct__">📁 Upload Video & Poster Langsung di Sini (Max 50 MB)</option>
       </select>
 
-      <button class="btn" onclick="submitContent()">🚀 Simpan & Lanjutkan</button>
+      <div id="direct-upload-box" class="hidden">
+        <div id="direct-mode-warn" class="warn-box hidden">
+          ⚠️ Kamu sedang di mode <b>Keyboard (Tanpa Tunnel)</b>. Upload file dari galeri di halaman ini butuh backend HTTPS (mode <b>inline</b>). Untuk sekarang pakai pilihan <b>Kirim via Chat Bot / Gudang</b> (bisa kirim Album Foto Poster + Video sekaligus dalam 1x kirim!).
+        </div>
+
+        <label class="field-label" id="poster-file-label">File Poster (Opsional)</label>
+        <label class="file-drop" id="poster-drop">
+          <input type="file" id="poster-file" accept="image/*" onchange="onPosterSelected(this)" />
+          <div class="file-drop-title" id="poster-file-name">🖼️ Pilih Foto Poster</div>
+          <div class="file-drop-sub">JPG / PNG / WebP</div>
+          <img id="poster-preview" class="poster-preview" alt="Preview Poster" />
+        </label>
+
+        <label class="field-label">File Video (Maks. 50 MB)</label>
+        <label class="file-drop">
+          <input type="file" id="video-file" accept="video/*" onchange="onVideoSelected(this)" />
+          <div class="file-drop-title" id="video-file-name">🎥 Pilih File Video dari HP</div>
+          <div class="file-drop-sub" id="video-file-size">MP4 / MKV (Batas Telegram Bot API: 50 MB)</div>
+        </label>
+
+        <div class="progress-wrap" id="upload-progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="upload-progress-fill"></div></div>
+          <div class="progress-text" id="upload-progress-text">Mengunggah 0%...</div>
+        </div>
+      </div>
+
+      <button class="btn" id="submit-upload-btn" onclick="submitContent()">🚀 Simpan & Lanjutkan</button>
     </div>
   </div>
 
@@ -709,6 +599,8 @@
     let editEpisodesState = [];
     let typeFilter = 'all';
     let slugEditedManually = false;
+
+    const hasBackendApi = Boolean(tg.initData && tg.initData.length > 0);
 
     function esc(str) {
       return String(str || '')
@@ -820,11 +712,14 @@
         : '<option value="">Belum ada serial</option>';
 
       const sourceSel = document.getElementById('video-source');
-      sourceSel.innerHTML = '<option value="">📤 Upload / Forward Video Setelah Ini</option>';
+      sourceSel.innerHTML = `
+        <option value="">💬 Kirim / Forward via Chat Bot / Gudang (Max 2 GB)</option>
+        <option value="__direct__">📁 Upload Video & Poster Langsung di Sini (Max 50 MB)</option>
+      `;
       (state.d || []).forEach((drf) => {
         const opt = document.createElement('option');
         opt.value = drf.id;
-        opt.textContent = `📦 Draft: ${drf.n}`;
+        opt.textContent = `📦 Draft Gudang: ${drf.n}`;
         sourceSel.appendChild(opt);
       });
     }
@@ -837,6 +732,53 @@
         uploadCats.add(slug);
         el.classList.add('selected');
       }
+    }
+
+    function toggleFileUploadUI() {
+      const val = document.getElementById('video-source').value;
+      const isDirect = val === '__direct__';
+      document.getElementById('direct-upload-box').classList.toggle('hidden', !isDirect);
+
+      const warnEl = document.getElementById('direct-mode-warn');
+      warnEl.classList.toggle('hidden', hasBackendApi);
+
+      const btn = document.getElementById('submit-upload-btn');
+      if (isDirect && !hasBackendApi) {
+        btn.disabled = true;
+        btn.textContent = '⚠️ Butuh Mode Inline + Backend HTTPS';
+      } else {
+        btn.disabled = false;
+        btn.textContent = isDirect ? '🚀 Upload Video & Poster Sekarang' : '🚀 Simpan & Lanjutkan';
+      }
+    }
+
+    function onPosterSelected(input) {
+      const file = input.files[0];
+      const preview = document.getElementById('poster-preview');
+      if (!file) {
+        document.getElementById('poster-file-name').textContent = '🖼️ Pilih Foto Poster';
+        preview.style.display = 'none';
+        return;
+      }
+      document.getElementById('poster-file-name').textContent = `🖼️ ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function onVideoSelected(input) {
+      const file = input.files[0];
+      if (!file) {
+        document.getElementById('video-file-name').textContent = '🎥 Pilih File Video dari HP';
+        document.getElementById('video-file-size').textContent = 'MP4 / MKV (Batas Telegram Bot API: 50 MB)';
+        return;
+      }
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      document.getElementById('video-file-name').textContent = `🎥 ${file.name}`;
+      document.getElementById('video-file-size').textContent = `Ukuran: ${mb} MB` + (file.size > 50 * 1024 * 1024 ? ' ⚠️ Melebihi 50 MB!' : ' ✅ Siap upload');
     }
 
     function renderCategories() {
@@ -869,6 +811,8 @@
       document.getElementById('title-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('desc-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('ep-title-box').classList.toggle('hidden', mode === 'film');
+      document.getElementById('poster-drop').classList.toggle('hidden', mode === 'add_episode');
+      document.getElementById('poster-file-label').classList.toggle('hidden', mode === 'add_episode');
     }
 
     function quickAddEpisode(seriesId) {
@@ -895,7 +839,6 @@
       `).join('');
 
       const epBox = document.getElementById('edit-episodes-box');
-      const epList = document.getElementById('edit-episodes-list');
       if (item.sr && Array.isArray(item.ep)) {
         epBox.classList.remove('hidden');
         editEpisodesState = item.ep.map((title, idx) => ({ idx, title, del: false }));
@@ -954,11 +897,7 @@
         categories: Array.from(editItemCats),
         updateKatalog
       };
-
-      if (editEpisodesState.length > 0) {
-        payload.episodes = editEpisodesState;
-      }
-
+      if (editEpisodesState.length > 0) payload.episodes = editEpisodesState;
       sendAdmin(payload);
     }
 
@@ -1012,16 +951,93 @@
       sendAdmin({ adminAction: 'delete_item', itemId });
     }
 
+    function uploadDirectFiles() {
+      const mode = document.getElementById('upload-mode').value;
+      const title = document.getElementById('content-title').value.trim();
+      const description = document.getElementById('content-desc').value.trim();
+      const epTitle = document.getElementById('ep-title').value.trim();
+      const seriesId = document.getElementById('existing-series').value;
+      const posterUrl = document.getElementById('poster-url').value.trim();
+      const videoFile = document.getElementById('video-file').files[0];
+      const posterFile = document.getElementById('poster-file').files[0];
+
+      if (!videoFile) return alert('Pilih file video dulu!');
+      if (videoFile.size > 50 * 1024 * 1024) {
+        return alert('Ukuran video melebihi 50 MB! Untuk file besar, gunakan pilihan Kirim via Chat Bot / Gudang.');
+      }
+
+      const formData = new FormData();
+      formData.append('initData', tg.initData);
+      formData.append('mode', mode);
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('epTitle', epTitle);
+      formData.append('seriesId', seriesId);
+      formData.append('posterUrl', posterUrl);
+      formData.append('categories', JSON.stringify(Array.from(uploadCats)));
+      formData.append('video', videoFile);
+      if (posterFile) formData.append('poster', posterFile);
+
+      const btn = document.getElementById('submit-upload-btn');
+      const progWrap = document.getElementById('upload-progress-wrap');
+      const progFill = document.getElementById('upload-progress-fill');
+      const progText = document.getElementById('upload-progress-text');
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Sedang Mengunggah...';
+      progWrap.style.display = 'block';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/admin/upload', true);
+
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          progFill.style.width = pct + '%';
+          progText.textContent = pct < 100 ? `Mengunggah ke server... ${pct}%` : 'Memproses & mengirim ke Telegram...';
+        }
+      };
+
+      xhr.onload = () => {
+        btn.disabled = false;
+        btn.textContent = '🚀 Upload Video & Poster Sekarang';
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300 && res.ok) {
+            alert(`✅ Berhasil diupload: ${res.title}`);
+            tg.close();
+          } else {
+            alert(res.error || 'Upload gagal.');
+          }
+        } catch {
+          alert('Respon server tidak valid.');
+        }
+      };
+
+      xhr.onerror = () => {
+        btn.disabled = false;
+        btn.textContent = '🚀 Upload Video & Poster Sekarang';
+        alert('Koneksi upload terputus.');
+      };
+
+      xhr.send(formData);
+    }
+
     function submitContent() {
       const mode = document.getElementById('upload-mode').value;
       const title = document.getElementById('content-title').value.trim();
       const description = document.getElementById('content-desc').value.trim();
       const epTitle = document.getElementById('ep-title').value.trim();
       const seriesId = document.getElementById('existing-series').value;
-      const draftId = document.getElementById('video-source').value;
+      const posterUrl = document.getElementById('poster-url').value.trim();
+      const sourceVal = document.getElementById('video-source').value;
 
       if (mode !== 'add_episode' && !title) return alert('Judul wajib diisi!');
       if (mode === 'add_episode' && !seriesId) return alert('Pilih serial terlebih dahulu!');
+
+      if (sourceVal === '__direct__') {
+        return uploadDirectFiles();
+      }
 
       sendAdmin({
         adminAction: 'prepare_upload',
@@ -1030,7 +1046,8 @@
         description,
         epTitle,
         seriesId,
-        draftId,
+        posterUrl,
+        draftId: sourceVal,
         categories: Array.from(uploadCats)
       });
     }
@@ -1041,7 +1058,7 @@
         return;
       }
 
-      if (tg.initData && tg.initData.length > 0) {
+      if (hasBackendApi) {
         try {
           const res = await fetch('/api/admin', {
             method: 'POST',
