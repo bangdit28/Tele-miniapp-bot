@@ -162,7 +162,7 @@
       transition: border-color 0.2s;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-    textarea { min-height: 74px; resize: vertical; }
+    textarea { min-height: 82px; resize: vertical; }
 
     /* TMDB AUTOCOMPLETE */
     .tmdb-box {
@@ -564,7 +564,7 @@
       </div>
 
       <div id="desc-box">
-        <label class="field-label">Tahun / Sinopsis (Opsional)</label>
+        <label class="field-label">Tahun / Sinopsis (Otomatis Bahasa Indo)</label>
         <textarea id="content-desc" placeholder="Tahun: 2025&#10;Sinopsis singkat..."></textarea>
 
         <label class="field-label">Pilih Kategori</label>
@@ -787,6 +787,38 @@
       renderItems();
     }
 
+    // === AUTO TRANSLATE SINOPSIS KE BAHASA INDONESIA ===
+    async function translateToIndo(text) {
+      const clean = String(text || '').trim();
+      if (!clean) return '';
+
+      // 1. Coba Google Translate gratis
+      try {
+        const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=id&dt=t&q=${encodeURIComponent(clean)}`;
+        const res = await fetch(gUrl);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data?.[0])) {
+            const joined = data[0].map((part) => part?.[0] || '').join('').trim();
+            if (joined) return joined;
+          }
+        }
+      } catch {}
+
+      // 2. Fallback ke MyMemory API (CORS aktif)
+      try {
+        const mUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(clean.slice(0, 480))}&langpair=en|id`;
+        const res = await fetch(mUrl);
+        if (res.ok) {
+          const data = await res.json();
+          const tr = data?.responseData?.translatedText;
+          if (tr && !String(tr).includes('MYMEMORY WARNING')) return tr.trim();
+        }
+      } catch {}
+
+      return clean;
+    }
+
     // === TMDB API HELPER ===
     async function fetchTmdb(apiPath) {
       const key = (state.tmdb || '').trim();
@@ -876,21 +908,6 @@
       const year = dt ? dt.slice(0, 4) : '';
       const posterUrl = r.poster_path ? `https://image.tmdb.org/t/p/w780${r.poster_path}` : '';
 
-      let overview = (r.overview || '').trim();
-      if (!overview) {
-        try {
-          const en = await fetchTmdb(`/${r.media_type}/${r.id}?language=en-US`);
-          overview = (en.overview || '').trim();
-        } catch {}
-      }
-
-      const descLines = [];
-      if (year) descLines.push(`Tahun: ${year}`);
-      if (r.vote_average) descLines.push(`⭐ Rating: ${r.vote_average.toFixed(1)}/10`);
-      if (overview) descLines.push(`\n${overview}`);
-      const fullDesc = descLines.join('\n').slice(0, 600);
-
-      // Mapping genre TMDB ke kategori grup
       const validSlugs = new Set((state.c || []).map((c) => c.slug));
       const genreMap = { 27: 'horror', 35: 'comedy', 16: 'anime', 28: 'action', 18: 'drama', 878: 'scifi', 53: 'thriller', 10749: 'romance' };
       const autoCats = new Set();
@@ -901,11 +918,12 @@
         if (s && validSlugs.has(s)) autoCats.add(s);
       });
 
+      const descEl = document.getElementById(target === 'upload' ? 'content-desc' : 'edit-item-desc');
+
       if (target === 'upload') {
         document.getElementById('upload-mode').value = isTv ? 'serial' : 'film';
         toggleUploadMode();
         document.getElementById('content-title').value = title;
-        document.getElementById('content-desc').value = fullDesc;
         document.getElementById('poster-url').value = posterUrl;
         document.getElementById('tmdb-search-upload').value = title;
 
@@ -927,7 +945,6 @@
         pickedEl.classList.add('show');
       } else {
         document.getElementById('edit-item-title').value = title;
-        document.getElementById('edit-item-desc').value = fullDesc;
         document.getElementById('edit-item-poster').value = posterUrl;
         document.getElementById('tmdb-search-edit').value = title;
 
@@ -936,6 +953,22 @@
           renderEditCatChips();
         }
       }
+
+      let overview = (r.overview || '').trim();
+      if (!overview) {
+        descEl.value = '⏳ Mengambil & menerjemahkan sinopsis ke Bahasa Indonesia...';
+        try {
+          const en = await fetchTmdb(`/${r.media_type}/${r.id}?language=en-US`);
+          const enText = (en.overview || '').trim();
+          if (enText) overview = await translateToIndo(enText);
+        } catch {}
+      }
+
+      const descLines = [];
+      if (year) descLines.push(`Tahun: ${year}`);
+      if (r.vote_average) descLines.push(`⭐ Rating: ${r.vote_average.toFixed(1)}/10`);
+      if (overview) descLines.push(`\n${overview}`);
+      descEl.value = descLines.join('\n').slice(0, 600);
     }
 
     function switchTab(name) {
