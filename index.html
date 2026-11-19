@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verifikasi Konten</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: var(--tg-theme-bg-color, #18181b);
+      color: var(--tg-theme-text-color, #ffffff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .ad-box {
+      width: 100%;
+      max-width: 320px;
+      min-height: 250px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px 0;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: var(--tg-theme-button-color, #2563eb);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h3>Menyiapkan Video...</h3>
+    <p id="status-text">Mohon tunggu <span id="timer">5</span> detik.</p>
+  </div>
+
+  <!-- SLOT IKLAN ADSTERRA -->
+  <div class="ad-box">
+    <!-- PASTE SCRIPT BANNER / NATIVE BANNER ADSTERRA KAMU DI SINI -->
+    <small>Area Banner Iklan Adsterra (300x250)</small>
+  </div>
+
+  <button id="claim-btn" class="btn" disabled>Tunggu Sebentar...</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const params = new URLSearchParams(window.location.search);
+    const itemId = params.get('id') || '';
+
+    let seconds = 5;
+    const timerEl = document.getElementById('timer');
+    const statusEl = document.getElementById('status-text');
+    const claimBtn = document.getElementById('claim-btn');
+
+    const countdown = setInterval(() => {
+      seconds--;
+      if (seconds > 0) {
+        timerEl.textContent = seconds;
+      } else {
+        clearInterval(countdown);
+        statusEl.textContent = 'Video siap dikirim ke chat!';
+        claimBtn.disabled = false;
+        claimBtn.textContent = '📥 Kirim Video ke Chat';
+      }
+    }, 1000);
+
+    claimBtn.addEventListener('click', async () => {
+      if (!itemId) {
+        alert('ID video tidak valid.');
+        return;
+      }
+
+      if (tg.platform === 'unknown') {
+        alert('Halaman ini harus dibuka dari tombol di dalam Bot Telegram.');
+        return;
+      }
+
+      claimBtn.disabled = true;
+      claimBtn.textContent = 'Mengirim...';
+
+      // Mode Inline (jika ada initData dari Inline Button & backend aktif)
+      if (tg.initData && tg.initData.length > 0) {
+        try {
+          const res = await fetch('/api/claim', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              initData: tg.initData,
+              itemId: itemId
+            })
+          });
+          const data = await res.json();
+
+          if (data.ok) {
+            claimBtn.textContent = '✅ Terkirim!';
+            setTimeout(() => tg.close(), 800);
+          } else {
+            alert(data.error || 'Terjadi kesalahan.');
+            claimBtn.disabled = false;
+            claimBtn.textContent = 'Coba Lagi';
+          }
+        } catch (err) {
+          alert('Koneksi gagal.');
+          claimBtn.disabled = false;
+          claimBtn.textContent = 'Coba Lagi';
+        }
+        return;
+      }
+
+      // Mode Keyboard (100% Tanpa Tunnel / GitHub Pages / Cloudflare Pages)
+      tg.sendData(JSON.stringify({ itemId: itemId }));
+    });
+  </script>
+</body>
+</html>
