@@ -2,149 +2,575 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Studio Admin Panel</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--tg-theme-bg-color, #121216);
-      color: var(--tg-theme-text-color, #f4f4f5);
-      margin: 0;
-      padding: 16px;
+    :root {
+      --bg: #0b0e14;
+      --card: #141923;
+      --card-2: #1b2230;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.25);
+      --indigo: #6366f1;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #ef4444;
     }
-    .header {
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 14px 14px 32px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    /* HEADER */
+    .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 14px;
     }
-    .header h2 { margin: 0; font-size: 18px; }
-    .badge {
-      font-size: 12px;
-      padding: 4px 10px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px var(--primary-glow);
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .brand span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .owner-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
       border-radius: 999px;
-      background: rgba(37, 99, 235, 0.2);
-      color: #60a5fa;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      color: #34d399;
+      font-size: 11px;
       font-weight: 600;
     }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+    .dot-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
     }
-    .tab-btn {
-      flex: 1;
-      padding: 10px 6px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: inherit;
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .stat-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* SEGMENTED TABS */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      position: sticky;
+      top: 8px;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+    }
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 8px 4px;
+      border: none;
       border-radius: 10px;
-      font-size: 13px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .tab-btn.active {
-      background: var(--tg-theme-button-color, #2563eb);
-      color: var(--tg-theme-button-text-color, #ffffff);
-      border-color: transparent;
+    .nav-tab svg {
+      width: 17px;
+      height: 17px;
     }
-    .panel { display: none; }
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      color: #fff;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .panel { display: none; animation: fadeIn 0.2s ease; }
     .panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CARDS & FORM */
     .card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 14px;
-      margin-bottom: 14px;
-    }
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      opacity: 0.85;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(0,0,0,0.25);
-      color: inherit;
-      font-size: 14px;
       margin-bottom: 12px;
     }
-    textarea { min-height: 75px; resize: vertical; }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
+    textarea { min-height: 78px; resize: vertical; }
+
+    /* SEARCH & FILTERS */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+    }
+    .search-wrap input {
+      padding-left: 36px;
+      margin-bottom: 0;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .pill-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .pill-btn.active {
+      background: rgba(59, 130, 246, 0.16);
+      border-color: var(--primary);
+      color: #60a5fa;
+    }
+
+    /* CHIPS */
     .chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 7px;
       margin-bottom: 14px;
     }
     .chip {
       padding: 7px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.05);
-      font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
       user-select: none;
+      transition: all 0.15s ease;
     }
     .chip.selected {
-      background: #2563eb;
-      border-color: #3b82f6;
-      color: #fff;
+      background: rgba(59, 130, 246, 0.2);
+      border-color: var(--primary);
+      color: #93c5fd;
     }
+
+    /* CONTENT ITEM LIST */
+    .item-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px;
+      margin-bottom: 10px;
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-word;
+    }
+    .item-type {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.16);
+      color: #a5b4fc;
+    }
+    .item-type.film {
+      background: rgba(59, 130, 246, 0.16);
+      color: #93c5fd;
+    }
+    .item-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .mini-tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--card-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .sync-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--emerald);
+    }
+    .sync-tag.nosync { color: var(--amber); }
+
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+
+    /* BUTTONS */
     .btn {
       width: 100%;
-      padding: 12px;
+      padding: 12px 14px;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 11px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      background: var(--tg-theme-button-color, #2563eb);
-      color: var(--tg-theme-button-text-color, #ffffff);
-    }
-    .btn-danger {
-      background: #dc2626;
       color: #fff;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      box-shadow: 0 4px 14px var(--primary-glow);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-sm {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .btn-sm.primary {
+      background: rgba(59, 130, 246, 0.16);
+      border-color: rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+    }
+    .btn-sm.danger {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.28);
+      color: #fca5a5;
+      flex: 0 0 auto;
+    }
+
+    /* CATEGORY ROW */
+    .cat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .cat-info strong { display: block; font-size: 14px; }
+    .cat-info span { font-size: 11px; color: var(--muted); }
+    .cat-btns { display: flex; gap: 5px; }
+    .icon-btn {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
       font-size: 12px;
       cursor: pointer;
     }
-    .cat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+    .icon-btn.danger {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.1);
     }
-    .cat-row:last-child { border-bottom: none; }
-    .muted { font-size: 12px; opacity: 0.7; }
-    .hidden { display: none; }
+
+    /* BOTTOM-SHEET MODAL */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-sheet {
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: #141923;
+      border-top: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px 20px 0 0;
+      padding: 18px 16px 26px;
+      animation: slideUp 0.22s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .modal-head h3 { margin: 0; font-size: 16px; }
+    .close-x {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card-2);
+      color: var(--text);
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .ep-edit-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .ep-edit-row input { margin-bottom: 0; padding: 8px 10px; font-size: 13px; }
+    .ep-edit-row.deleted input {
+      opacity: 0.35;
+      text-decoration: line-through;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .checkbox-row input { width: 16px; height: 16px; margin: 0; }
+
+    .empty-box {
+      text-align: center;
+      padding: 28px 14px;
+      color: var(--muted);
+      background: var(--card);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+    }
+    .hidden { display: none !important; }
+    .hint { font-size: 11px; color: var(--muted); margin-top: -6px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h2>🛠️ Admin Panel</h2>
-    <span class="badge" id="stats-badge">0 Konten</span>
+
+  <!-- TOP HEADER -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Studio Bot Panel</h1>
+        <span>Kelola Konten & Kategori</span>
+      </div>
+    </div>
+    <div class="owner-pill"><span class="dot-live"></span> Owner</div>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('upload')">🎬 Tambah Konten</button>
-    <button class="tab-btn" onclick="switchTab('cats')">🏷️ Kategori</button>
-    <button class="tab-btn" onclick="switchTab('tools')">⚙️ Tools</button>
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val" id="st-total">0</div>
+      <div class="stat-lbl">Total Konten</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="st-cats">0</div>
+      <div class="stat-lbl">Kategori Grup</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" id="st-drafts">0</div>
+      <div class="stat-lbl">Draft Gudang</div>
+    </div>
   </div>
 
-  <!-- TAB 1: TAMBAH FILM / SERIAL -->
-  <div id="tab-upload" class="panel active">
+  <!-- NAVIGATION TABS -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="content" onclick="switchTab('content')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      Konten
+    </button>
+    <button class="nav-tab" data-tab="upload" onclick="switchTab('upload')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Tambah
+    </button>
+    <button class="nav-tab" data-tab="cats" onclick="switchTab('cats')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+      Kategori
+    </button>
+    <button class="nav-tab" data-tab="tools" onclick="switchTab('tools')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      Tools
+    </button>
+  </div>
+
+  <!-- TAB 1: KELOLA & EDIT KONTEN -->
+  <div id="tab-content" class="panel active">
+    <div class="search-wrap">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input type="text" id="search-items" placeholder="Cari judul atau kode..." oninput="renderItems()" />
+    </div>
+
+    <div class="filter-pills">
+      <button class="pill-btn active" onclick="setTypeFilter('all', this)">Semua</button>
+      <button class="pill-btn" onclick="setTypeFilter('film', this)">🎬 Film</button>
+      <button class="pill-btn" onclick="setTypeFilter('serial', this)">📺 Serial</button>
+    </div>
+
+    <div id="items-container"></div>
+    <p class="hint" style="text-align:center;margin-top:10px;">Menampilkan maks. 25 konten terbaru. Untuk mencari konten lama, ketik <code>/admin judul</code> di chat bot.</p>
+  </div>
+
+  <!-- TAB 2: TAMBAH FILM / SERIAL -->
+  <div id="tab-upload" class="panel">
     <div class="card">
-      <label>Jenis Konten</label>
+      <div class="card-title">🎬 Tambah Konten Baru</div>
+
+      <label class="field-label">Jenis Konten</label>
       <select id="upload-mode" onchange="toggleUploadMode()">
         <option value="film">🎬 Film Baru (Single Video)</option>
         <option value="serial">📺 Serial Baru (Multi Episode)</option>
@@ -152,29 +578,29 @@
       </select>
 
       <div id="existing-series-box" class="hidden">
-        <label>Pilih Serial</label>
+        <label class="field-label">Pilih Serial</label>
         <select id="existing-series"></select>
       </div>
 
       <div id="title-box">
-        <label>Judul Film / Serial</label>
+        <label class="field-label">Judul Film / Serial</label>
         <input type="text" id="content-title" placeholder="Contoh: MobLand Season 1" />
       </div>
 
       <div id="ep-title-box" class="hidden">
-        <label>Nama / Nomor Episode</label>
-        <input type="text" id="ep-title" placeholder="Contoh: Episode 1 (atau kosongkan auto)" />
+        <label class="field-label">Nama / Nomor Episode</label>
+        <input type="text" id="ep-title" placeholder="Contoh: Episode 1 (kosongkan untuk otomatis)" />
       </div>
 
       <div id="desc-box">
-        <label>Tahun / Sinopsis (Opsional)</label>
+        <label class="field-label">Tahun / Sinopsis (Opsional)</label>
         <textarea id="content-desc" placeholder="Tahun: 2025&#10;Sinopsis singkat..."></textarea>
 
-        <label>Pilih Kategori (Klik untuk memilih)</label>
-        <div class="chips" id="cat-chips"></div>
+        <label class="field-label">Pilih Kategori</label>
+        <div class="chips" id="upload-cat-chips"></div>
       </div>
 
-      <label>Sumber Video</label>
+      <label class="field-label">Sumber Video</label>
       <select id="video-source">
         <option value="">📤 Upload / Forward Video Setelah Ini</option>
       </select>
@@ -183,33 +609,92 @@
     </div>
   </div>
 
-  <!-- TAB 2: KELOLA KATEGORI GRUP -->
+  <!-- TAB 3: KELOLA KATEGORI GRUP -->
   <div id="tab-cats" class="panel">
     <div class="card">
-      <label>Tambah Kategori Baru ke Bot & Grup</label>
-      <input type="text" id="new-cat-label" placeholder="Nama Tombol (misal: 💥 Action)" />
-      <input type="text" id="new-cat-slug" placeholder="Hashtag tanpa # (misal: action)" />
-      <button class="btn" onclick="addCategory()">➕ Tambah Kategori</button>
+      <div class="card-title">➕ Tambah Kategori Baru</div>
+      <label class="field-label">Nama Tombol (Boleh pakai Emoji)</label>
+      <input type="text" id="new-cat-label" placeholder="Contoh: 💥 Action" oninput="autoSlug(this.value)" />
+      <label class="field-label">Kode Hashtag (Tanpa #)</label>
+      <input type="text" id="new-cat-slug" placeholder="Contoh: action" />
+      <button class="btn" onclick="addCategory()">Tambah Kategori ke Grup</button>
     </div>
 
     <div class="card">
-      <label>Kategori Aktif di Grup</label>
+      <div class="card-title">🏷️ Kategori Aktif di Grup</div>
       <div id="cat-list"></div>
     </div>
   </div>
 
-  <!-- TAB 3: TOOLS -->
+  <!-- TAB 4: TOOLS & SYNC -->
   <div id="tab-tools" class="panel">
     <div class="card">
-      <label>Sinkronisasi Channel Katalog</label>
-      <p class="muted">Posting otomatis konten lama yang belum masuk Channel Katalog agar semua link di Grup loncat ke Channel.</p>
+      <div class="card-title">📢 Sinkronisasi Channel Katalog</div>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 12px;">
+        Posting otomatis konten yang belum masuk ke Channel Katalog supaya semua klik di Grup mengarah ke Channel dulu.
+      </p>
       <button class="btn" onclick="sendAdmin({ adminAction: 'sync_katalog' })">🔄 Sync Semua ke Katalog</button>
     </div>
 
     <div class="card">
-      <label>Hapus Konten</label>
-      <input type="text" id="del-item-id" placeholder="Masukkan kode (misal: vid_xxx atau ser_xxx)" />
-      <button class="btn" style="background:#dc2626" onclick="deleteItem()">🗑️ Hapus Konten</button>
+      <div class="card-title">ℹ️ Informasi Server</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+        • Mode WebApp: <strong style="color:#fff" id="info-mode">-</strong><br/>
+        • URL Mini App: <strong style="color:#fff;word-break:break-all" id="info-url">-</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT KONTEN -->
+  <div id="edit-item-modal" class="modal-backdrop" onclick="if(event.target===this) closeModal('edit-item-modal')">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3>✏️ Edit Konten</h3>
+        <button class="close-x" onclick="closeModal('edit-item-modal')">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-item-id" />
+
+      <label class="field-label">Judul</label>
+      <input type="text" id="edit-item-title" />
+
+      <label class="field-label">Tahun / Sinopsis</label>
+      <textarea id="edit-item-desc"></textarea>
+
+      <label class="field-label">Kategori</label>
+      <div class="chips" id="edit-cat-chips"></div>
+
+      <div id="edit-episodes-box" class="hidden">
+        <label class="field-label">Daftar Episode (Edit nama atau hapus)</label>
+        <div id="edit-episodes-list" style="margin-bottom:12px;"></div>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="edit-update-katalog" checked />
+        <span>Update postingan di Channel Katalog otomatis</span>
+      </label>
+
+      <button class="btn" onclick="saveItemEdit()">💾 Simpan Perubahan</button>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT KATEGORI -->
+  <div id="edit-cat-modal" class="modal-backdrop" onclick="if(event.target===this) closeModal('edit-cat-modal')">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3>✏️ Edit Kategori</h3>
+        <button class="close-x" onclick="closeModal('edit-cat-modal')">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-cat-old-slug" />
+
+      <label class="field-label">Nama Tombol di Grup</label>
+      <input type="text" id="edit-cat-label" />
+
+      <label class="field-label">Kode Hashtag (tanpa #)</label>
+      <input type="text" id="edit-cat-slug" />
+
+      <button class="btn" onclick="saveCatEdit()">💾 Simpan Kategori</button>
     </div>
   </div>
 
@@ -218,8 +703,20 @@
     tg.ready();
     tg.expand();
 
-    let state = { c: [], s: [], d: [], stats: { total: 0 } };
-    let selectedCats = new Set();
+    let state = { c: [], d: [], items: [], stats: { total: 0, cats: 0, drafts: 0, mode: '-', url: '-' } };
+    let uploadCats = new Set();
+    let editItemCats = new Set();
+    let editEpisodesState = [];
+    let typeFilter = 'all';
+    let slugEditedManually = false;
+
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
 
     function decodeBase64Url(str) {
       const base64 = str.replace(/-/g, '+').replace(/_/g, '/');
@@ -236,62 +733,94 @@
           state = decodeBase64Url(raw);
         }
       } catch (e) {
-        console.error('Gagal decode state:', e);
+        console.error('Decode error:', e);
       }
 
-      document.getElementById('stats-badge').textContent = `${state.stats?.total || 0} Konten`;
+      document.getElementById('st-total').textContent = state.stats?.total ?? (state.items || []).length;
+      document.getElementById('st-cats').textContent = state.stats?.cats ?? (state.c || []).length;
+      document.getElementById('st-drafts').textContent = state.stats?.drafts ?? (state.d || []).length;
+      document.getElementById('info-mode').textContent = state.stats?.mode || 'keyboard';
+      document.getElementById('info-url').textContent = state.stats?.url || '-';
 
-      // Render kategori chips & list
-      const chipsEl = document.getElementById('cat-chips');
-      const listEl = document.getElementById('cat-list');
-      chipsEl.innerHTML = '';
-      listEl.innerHTML = '';
+      if (state.c?.length) uploadCats.add(state.c[0].slug);
 
-      (state.c || []).forEach((cat, idx) => {
-        if (idx === 0) selectedCats.add(cat.slug);
+      renderUploadForm();
+      renderCategories();
+      renderItems();
+    }
 
-        const chip = document.createElement('div');
-        chip.className = 'chip' + (selectedCats.has(cat.slug) ? ' selected' : '');
-        chip.textContent = cat.label;
-        chip.onclick = () => {
-          if (selectedCats.has(cat.slug)) {
-            selectedCats.delete(cat.slug);
-            chip.classList.remove('selected');
-          } else {
-            selectedCats.add(cat.slug);
-            chip.classList.add('selected');
-          }
-        };
-        chipsEl.appendChild(chip);
+    function switchTab(name) {
+      document.querySelectorAll('.nav-tab').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.tab === name);
+      });
+      document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+    }
 
-        const row = document.createElement('div');
-        row.className = 'cat-row';
-        row.innerHTML = `
-          <div>
-            <strong>${cat.label}</strong>
-            <div class="muted">#${cat.slug}</div>
-          </div>
-          <button class="btn-danger" onclick="delCategory('${cat.slug}')">Hapus</button>
-        `;
-        listEl.appendChild(row);
+    function setTypeFilter(type, btn) {
+      typeFilter = type;
+      document.querySelectorAll('.pill-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderItems();
+    }
+
+    function renderItems() {
+      const container = document.getElementById('items-container');
+      const q = document.getElementById('search-items').value.trim().toLowerCase();
+
+      const filtered = (state.items || []).filter((it) => {
+        if (typeFilter === 'film' && it.sr) return false;
+        if (typeFilter === 'serial' && !it.sr) return false;
+        if (q && !it.t.toLowerCase().includes(q) && !it.i.toLowerCase().includes(q)) return false;
+        return true;
       });
 
-      // Render daftar serial
-      const seriesSel = document.getElementById('existing-series');
-      seriesSel.innerHTML = '';
-      if ((state.s || []).length === 0) {
-        seriesSel.innerHTML = '<option value="">Belum ada serial</option>';
-      } else {
-        state.s.forEach((ser) => {
-          const opt = document.createElement('option');
-          opt.value = ser.id;
-          opt.textContent = `${ser.t} (${ser.e} Eps)`;
-          seriesSel.appendChild(opt);
-        });
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="empty-box">Belum ada konten yang cocok.</div>`;
+        return;
       }
 
-      // Render draft gudang
+      container.innerHTML = filtered.map((it) => {
+        const badge = it.sr ? `📺 Serial • ${(it.ep || []).length} Eps` : '🎬 Film';
+        const tags = (it.c || []).map((s) => `<span class="mini-tag">#${esc(s)}</span>`).join('');
+        const syncHtml = it.k
+          ? `<span class="sync-tag">● Katalog</span>`
+          : `<span class="sync-tag nosync">○ Belum Sync</span>`;
+
+        return `
+          <div class="item-card">
+            <div class="item-top">
+              <div class="item-title">${esc(it.t)}</div>
+              <div class="item-type ${it.sr ? '' : 'film'}">${badge}</div>
+            </div>
+            ${it.d ? `<div class="item-desc">${esc(it.d)}</div>` : ''}
+            <div class="item-meta">${syncHtml} ${tags} <span class="mini-tag">${esc(it.i)}</span></div>
+            <div class="item-actions">
+              <button class="btn-sm primary" onclick="openEditItem('${esc(it.i)}')">✏️ Edit</button>
+              ${it.sr ? `<button class="btn-sm" onclick="quickAddEpisode('${esc(it.i)}')">➕ Episode</button>` : ''}
+              <button class="btn-sm danger" onclick="confirmDeleteItem('${esc(it.i)}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderUploadForm() {
+      const chipsEl = document.getElementById('upload-cat-chips');
+      chipsEl.innerHTML = (state.c || []).map((cat) => `
+        <div class="chip ${uploadCats.has(cat.slug) ? 'selected' : ''}" onclick="toggleUploadCat('${esc(cat.slug)}', this)">
+          ${esc(cat.label)}
+        </div>
+      `).join('');
+
+      const seriesSel = document.getElementById('existing-series');
+      const seriesList = (state.items || []).filter((it) => it.sr);
+      seriesSel.innerHTML = seriesList.length
+        ? seriesList.map((s) => `<option value="${esc(s.i)}">${esc(s.t)} (${(s.ep || []).length} Eps)</option>`).join('')
+        : '<option value="">Belum ada serial</option>';
+
       const sourceSel = document.getElementById('video-source');
+      sourceSel.innerHTML = '<option value="">📤 Upload / Forward Video Setelah Ini</option>';
       (state.d || []).forEach((drf) => {
         const opt = document.createElement('option');
         opt.value = drf.id;
@@ -300,12 +829,38 @@
       });
     }
 
-    function switchTab(name) {
-      document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        b.classList.toggle('active', ['upload', 'cats', 'tools'][i] === name);
-      });
-      document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
-      document.getElementById('tab-' + name).classList.add('active');
+    function toggleUploadCat(slug, el) {
+      if (uploadCats.has(slug)) {
+        uploadCats.delete(slug);
+        el.classList.remove('selected');
+      } else {
+        uploadCats.add(slug);
+        el.classList.add('selected');
+      }
+    }
+
+    function renderCategories() {
+      const listEl = document.getElementById('cat-list');
+      const cats = state.c || [];
+      if (!cats.length) {
+        listEl.innerHTML = '<div class="muted">Belum ada kategori.</div>';
+        return;
+      }
+
+      listEl.innerHTML = cats.map((cat, idx) => `
+        <div class="cat-item">
+          <div class="cat-info">
+            <strong>${esc(cat.label)}</strong>
+            <span>#${esc(cat.slug)}</span>
+          </div>
+          <div class="cat-btns">
+            <button class="icon-btn" ${idx === 0 ? 'disabled style="opacity:.35"' : ''} onclick="moveCategory('${esc(cat.slug)}', 'up')">⬆️</button>
+            <button class="icon-btn" ${idx === cats.length - 1 ? 'disabled style="opacity:.35"' : ''} onclick="moveCategory('${esc(cat.slug)}', 'down')">⬇️</button>
+            <button class="icon-btn" onclick="openEditCat('${esc(cat.slug)}')">✏️</button>
+            <button class="icon-btn danger" onclick="delCategory('${esc(cat.slug)}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     function toggleUploadMode() {
@@ -314,6 +869,170 @@
       document.getElementById('title-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('desc-box').classList.toggle('hidden', mode === 'add_episode');
       document.getElementById('ep-title-box').classList.toggle('hidden', mode === 'film');
+    }
+
+    function quickAddEpisode(seriesId) {
+      switchTab('upload');
+      document.getElementById('upload-mode').value = 'add_episode';
+      toggleUploadMode();
+      document.getElementById('existing-series').value = seriesId;
+    }
+
+    function openEditItem(itemId) {
+      const item = (state.items || []).find((x) => x.i === itemId);
+      if (!item) return;
+
+      document.getElementById('edit-item-id').value = item.i;
+      document.getElementById('edit-item-title').value = item.t;
+      document.getElementById('edit-item-desc').value = item.d || '';
+
+      editItemCats = new Set(item.c || []);
+      const chipsEl = document.getElementById('edit-cat-chips');
+      chipsEl.innerHTML = (state.c || []).map((cat) => `
+        <div class="chip ${editItemCats.has(cat.slug) ? 'selected' : ''}" onclick="toggleEditCat('${esc(cat.slug)}', this)">
+          ${esc(cat.label)}
+        </div>
+      `).join('');
+
+      const epBox = document.getElementById('edit-episodes-box');
+      const epList = document.getElementById('edit-episodes-list');
+      if (item.sr && Array.isArray(item.ep)) {
+        epBox.classList.remove('hidden');
+        editEpisodesState = item.ep.map((title, idx) => ({ idx, title, del: false }));
+        renderEditEpisodes();
+      } else {
+        epBox.classList.add('hidden');
+        editEpisodesState = [];
+      }
+
+      document.getElementById('edit-item-modal').classList.add('open');
+    }
+
+    function renderEditEpisodes() {
+      const epList = document.getElementById('edit-episodes-list');
+      epList.innerHTML = editEpisodesState.map((ep, i) => `
+        <div class="ep-edit-row ${ep.del ? 'deleted' : ''}">
+          <input type="text" value="${esc(ep.title)}" ${ep.del ? 'disabled' : ''} oninput="editEpisodesState[${i}].title = this.value" />
+          <button class="icon-btn ${ep.del ? '' : 'danger'}" onclick="toggleDeleteEp(${i})">${ep.del ? '↩️' : '🗑️'}</button>
+        </div>
+      `).join('');
+    }
+
+    function toggleDeleteEp(i) {
+      const activeCount = editEpisodesState.filter((e) => !e.del).length;
+      if (!editEpisodesState[i].del && activeCount <= 1) {
+        alert('Minimal harus tersisa 1 episode di serial.');
+        return;
+      }
+      editEpisodesState[i].del = !editEpisodesState[i].del;
+      renderEditEpisodes();
+    }
+
+    function toggleEditCat(slug, el) {
+      if (editItemCats.has(slug)) {
+        editItemCats.delete(slug);
+        el.classList.remove('selected');
+      } else {
+        editItemCats.add(slug);
+        el.classList.add('selected');
+      }
+    }
+
+    function saveItemEdit() {
+      const itemId = document.getElementById('edit-item-id').value;
+      const title = document.getElementById('edit-item-title').value.trim();
+      const description = document.getElementById('edit-item-desc').value.trim();
+      const updateKatalog = document.getElementById('edit-update-katalog').checked;
+
+      if (!title) return alert('Judul tidak boleh kosong!');
+
+      const payload = {
+        adminAction: 'edit_item',
+        itemId,
+        title,
+        description,
+        categories: Array.from(editItemCats),
+        updateKatalog
+      };
+
+      if (editEpisodesState.length > 0) {
+        payload.episodes = editEpisodesState;
+      }
+
+      sendAdmin(payload);
+    }
+
+    function openEditCat(slug) {
+      const cat = (state.c || []).find((c) => c.slug === slug);
+      if (!cat) return;
+      document.getElementById('edit-cat-old-slug').value = cat.slug;
+      document.getElementById('edit-cat-label').value = cat.label;
+      document.getElementById('edit-cat-slug').value = cat.slug;
+      document.getElementById('edit-cat-modal').classList.add('open');
+    }
+
+    function saveCatEdit() {
+      const oldSlug = document.getElementById('edit-cat-old-slug').value;
+      const label = document.getElementById('edit-cat-label').value.trim();
+      const slug = document.getElementById('edit-cat-slug').value.trim();
+      if (!label) return alert('Nama tombol kategori wajib diisi!');
+      sendAdmin({ adminAction: 'edit_category', oldSlug, label, slug });
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function autoSlug(val) {
+      if (slugEditedManually) return;
+      document.getElementById('new-cat-slug').value = val.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+    document.getElementById('new-cat-slug').addEventListener('input', () => {
+      slugEditedManually = true;
+    });
+
+    function addCategory() {
+      const label = document.getElementById('new-cat-label').value.trim();
+      const slug = document.getElementById('new-cat-slug').value.trim();
+      if (!label) return alert('Nama tombol wajib diisi!');
+      sendAdmin({ adminAction: 'add_category', label, slug });
+    }
+
+    function moveCategory(slug, direction) {
+      sendAdmin({ adminAction: 'move_category', slug, direction });
+    }
+
+    function delCategory(slug) {
+      if (!confirm(`Hapus kategori #${slug}?`)) return;
+      sendAdmin({ adminAction: 'del_category', slug });
+    }
+
+    function confirmDeleteItem(itemId) {
+      if (!confirm(`Hapus konten ${itemId} secara permanen dari bot?`)) return;
+      sendAdmin({ adminAction: 'delete_item', itemId });
+    }
+
+    function submitContent() {
+      const mode = document.getElementById('upload-mode').value;
+      const title = document.getElementById('content-title').value.trim();
+      const description = document.getElementById('content-desc').value.trim();
+      const epTitle = document.getElementById('ep-title').value.trim();
+      const seriesId = document.getElementById('existing-series').value;
+      const draftId = document.getElementById('video-source').value;
+
+      if (mode !== 'add_episode' && !title) return alert('Judul wajib diisi!');
+      if (mode === 'add_episode' && !seriesId) return alert('Pilih serial terlebih dahulu!');
+
+      sendAdmin({
+        adminAction: 'prepare_upload',
+        mode,
+        title,
+        description,
+        epTitle,
+        seriesId,
+        draftId,
+        categories: Array.from(uploadCats)
+      });
     }
 
     async function sendAdmin(payload) {
@@ -339,56 +1058,6 @@
       }
 
       tg.sendData(JSON.stringify(payload));
-    }
-
-    function submitContent() {
-      const mode = document.getElementById('upload-mode').value;
-      const title = document.getElementById('content-title').value.trim();
-      const description = document.getElementById('content-desc').value.trim();
-      const epTitle = document.getElementById('ep-title').value.trim();
-      const seriesId = document.getElementById('existing-series').value;
-      const draftId = document.getElementById('video-source').value;
-
-      if (mode !== 'add_episode' && !title) {
-        alert('Judul wajib diisi!');
-        return;
-      }
-      if (mode === 'add_episode' && !seriesId) {
-        alert('Pilih serial terlebih dahulu!');
-        return;
-      }
-
-      sendAdmin({
-        adminAction: 'prepare_upload',
-        mode,
-        title,
-        description,
-        epTitle,
-        seriesId,
-        draftId,
-        categories: Array.from(selectedCats)
-      });
-    }
-
-    function addCategory() {
-      const label = document.getElementById('new-cat-label').value.trim();
-      const slug = document.getElementById('new-cat-slug').value.trim();
-      if (!label) {
-        alert('Nama tombol kategori wajib diisi!');
-        return;
-      }
-      sendAdmin({ adminAction: 'add_category', label, slug });
-    }
-
-    function delCategory(slug) {
-      if (!confirm(`Hapus kategori #${slug}?`)) return;
-      sendAdmin({ adminAction: 'del_category', slug });
-    }
-
-    function deleteItem() {
-      const itemId = document.getElementById('del-item-id').value.trim();
-      if (!itemId) return alert('Isi kode item!');
-      sendAdmin({ adminAction: 'delete_item', itemId });
     }
 
     initFromHash();
