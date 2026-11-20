@@ -28,7 +28,7 @@
       overflow-x: hidden;
     }
 
-    /* FULLSCREEN POSTER WALLPAPER (TAJAM, HALUS, TIDAK MENCOLOK) */
+    /* FULLSCREEN POSTER WALLPAPER */
     #bg-poster {
       position: fixed;
       inset: 0;
@@ -157,9 +157,26 @@
     // Opsional: isi Direct Link Adsterra (CPC) kalau mau 2x klik, atau biarkan kosong ''
     const ADSTERRA_DIRECT_LINK = '';
 
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (typeof tg.disableClosingConfirmation === 'function') {
+        tg.disableClosingConfirmation();
+      }
+    }
+
+    function forceCloseMiniApp() {
+      if (!tg) return;
+      if (typeof tg.disableClosingConfirmation === 'function') {
+        tg.disableClosingConfirmation();
+      }
+      tg.close();
+      // Cadangan jika skrip iklan/overlay sempat menahan fokus WebView
+      setTimeout(() => {
+        try { tg.close(); } catch {}
+      }, 150);
+    }
 
     const params = new URLSearchParams(window.location.search);
     const itemId = params.get('id') || '';
@@ -216,7 +233,7 @@
           claimBtn.textContent = '🔓 Buka Video';
         } else {
           statusEl.textContent = 'Video siap dikirim ke chat!';
-          claimBtn.textContent = '📥 Kirim Video ke Chat';
+          claimBtn.textContent = '📥 Dapatkan Film';
         }
       }
     }, 1000);
@@ -227,7 +244,7 @@
         return;
       }
 
-      if (tg.platform === 'unknown') {
+      if (!tg || tg.platform === 'unknown') {
         alert('Halaman ini harus dibuka dari tombol di dalam Bot Telegram.');
         return;
       }
@@ -240,7 +257,7 @@
           window.open(ADSTERRA_DIRECT_LINK, '_blank');
         }
         statusEl.textContent = 'Terverifikasi! Klik lagi untuk kirim video.';
-        claimBtn.textContent = '📥 Kirim Video ke Chat';
+        claimBtn.textContent = '📥 Dapatkan Film';
         return;
       }
 
@@ -261,7 +278,7 @@
 
           if (data.ok) {
             claimBtn.textContent = '✅ Terkirim!';
-            setTimeout(() => tg.close(), 700);
+            forceCloseMiniApp();
           } else {
             alert(data.error || 'Terjadi kesalahan.');
             claimBtn.disabled = false;
@@ -276,6 +293,7 @@
       }
 
       tg.sendData(JSON.stringify({ itemId: itemId }));
+      forceCloseMiniApp();
     });
   </script>
 </body>
