@@ -640,9 +640,9 @@
     <div class="card">
       <div class="card-title">ℹ️ Informasi Server</div>
       <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-        • TMDB API: <strong style="color:#fff" id="info-tmdb">-</strong><br/>
-        • Mode WebApp: <strong style="color:#fff" id="info-mode">-</strong><br/>
-        • URL Mini App: <strong style="color:#fff;word-break:break-all" id="info-url">-</strong>
+- TMDB API: <strong style="color:#fff" id="info-tmdb">-</strong><br/>
+- Mode WebApp: <strong style="color:#fff" id="info-mode">-</strong><br/>
+- URL Mini App: <strong style="color:#fff;word-break:break-all" id="info-url">-</strong>
       </div>
     </div>
   </div>
@@ -719,9 +719,25 @@
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      if (typeof tg.disableClosingConfirmation === 'function') {
+        tg.disableClosingConfirmation();
+      }
+    }
+
+    function forceCloseMiniApp() {
+      if (!tg) return;
+      if (typeof tg.disableClosingConfirmation === 'function') {
+        tg.disableClosingConfirmation();
+      }
+      tg.close();
+      setTimeout(() => {
+        try { tg.close(); } catch {}
+      }, 150);
+    }
 
     let state = { c: [], d: [], items: [], tmdb: '', stats: { total: 0, cats: 0, drafts: 0, mode: '-', url: '-' } };
     let uploadCats = new Set();
@@ -733,7 +749,7 @@
     const tmdbTimers = { upload: null, edit: null };
     const tmdbCache = { upload: [], edit: [] };
 
-    const hasBackendApi = Boolean(tg.initData && tg.initData.length > 0);
+    const hasBackendApi = Boolean(tg && tg.initData && tg.initData.length > 0);
 
     function esc(str) {
       return String(str || '')
@@ -1350,7 +1366,7 @@
           const res = JSON.parse(xhr.responseText);
           if (xhr.status >= 200 && xhr.status < 300 && res.ok) {
             alert(`✅ Berhasil diupload: ${res.title}`);
-            tg.close();
+            forceCloseMiniApp();
           } else {
             alert(res.error || 'Upload gagal.');
           }
@@ -1398,7 +1414,7 @@
     }
 
     async function sendAdmin(payload) {
-      if (tg.platform === 'unknown') {
+      if (!tg || tg.platform === 'unknown') {
         alert('Harus dibuka dari tombol /admin di Bot Telegram!');
         return;
       }
@@ -1411,7 +1427,7 @@
             body: JSON.stringify({ initData: tg.initData, payload })
           });
           const data = await res.json();
-          if (data.ok) tg.close();
+          if (data.ok) forceCloseMiniApp();
           else alert(data.error || 'Gagal.');
         } catch {
           alert('Koneksi gagal.');
@@ -1420,6 +1436,7 @@
       }
 
       tg.sendData(JSON.stringify(payload));
+      forceCloseMiniApp();
     }
 
     initFromHash();
